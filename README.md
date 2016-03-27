@@ -1,0 +1,2 @@
+# bitlog
+log for golang.
