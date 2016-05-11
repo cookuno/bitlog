@@ -4,20 +4,26 @@ import (
 	"fmt"
 	"runtime"
 	"os"
+	"strings"
+	"time"
 )
 
-type Printer struct  {
+type printer struct  {
 	logger *BitLog
 	dp DataPkg
 }
 
-func (self *Printer) Attr(attr Attribute) *Printer {
+func newPrinter(logger *BitLog) *printer {
+	return &printer{logger:logger, dp:DataPkg{Time:time.Now()}}
+}
+
+func (self *printer) Attr(attr AttrMap) *printer {
 	self.dp.Attr = attr
 	return self
 }
 
-func (self *Printer) LineNo() *Printer {
-	_, file, line, ok := runtime.Caller(2)
+func (self *printer) LineNo() *printer {
+	_, file, line, ok := runtime.Caller(1)
 	if !ok {
 		file = "???"
 		line = 0
@@ -26,90 +32,135 @@ func (self *Printer) LineNo() *Printer {
 	return self
 }
 
-func (self *Printer) Debug(v ...interface{})  {
-	msg := fmt.Sprint(v)
+func (self *printer) Debug(v ...interface{})  {
+	msg := ""
+	for _, i := range v {
+		msg = msg + fmt.Sprint(i) + " "
+	}
+	msg = strings.TrimSpace(msg)
 	self.dp.Message = msg
 	self.dp.Level = LEVEL_DEBUG
-	self.logger.send(self.dp)
+	self.send()
 }
 
-func (self *Printer) DebugF(format string, v ...interface{})  {
-	msg := fmt.Sprintf(format, v)
+func (self *printer) DebugF(format string, v ...interface{})  {
+	msg := ""
+	for _, i := range v {
+		msg = msg + fmt.Sprintf(format, i) + " "
+	}
 	self.dp.Message = msg
 	self.dp.Level = LEVEL_DEBUG
-	self.logger.send(self.dp)
+	self.send()
 }
 
-func (self *Printer) Info(v ...interface{})  {
-	msg := fmt.Sprint(v)
+func (self *printer) Info(v ...interface{})  {
+	msg := ""
+	for _, i := range v {
+		msg = msg + fmt.Sprint(i) + " "
+	}
+	msg = strings.TrimSpace(msg)
 	self.dp.Message = msg
 	self.dp.Level = LEVEL_INFO
-	self.logger.send(self.dp)
+	self.send()
 }
 
-func (self *Printer) InfoF(format string, v ...interface{})  {
-	msg := fmt.Sprintf(format, v)
+func (self *printer) InfoF(format string, v ...interface{})  {
+	msg := ""
+	for _, i := range v {
+		msg = msg + fmt.Sprintf(format, i) + " "
+	}
 	self.dp.Message = msg
 	self.dp.Level = LEVEL_INFO
-	self.logger.send(self.dp)
+	self.send()
 }
 
-func (self *Printer) Warn(v ...interface{})  {
-	msg := fmt.Sprint(v)
+func (self *printer) Warn(v ...interface{})  {
+	msg := ""
+	for _, i := range v {
+		msg = msg + fmt.Sprint(i) + " "
+	}
+	msg = strings.TrimSpace(msg)
 	self.dp.Message = msg
 	self.dp.Level = LEVEL_WARN
-	self.logger.send(self.dp)
+	self.send()
 }
 
-func (self *Printer) WarnF(format string, v ...interface{})  {
-	msg := fmt.Sprintf(format, v)
+func (self *printer) WarnF(format string, v ...interface{})  {
+	msg := ""
+	for _, i := range v {
+		msg = msg + fmt.Sprintf(format, i) + " "
+	}
 	self.dp.Message = msg
 	self.dp.Level = LEVEL_WARN
-	self.logger.send(self.dp)
+	self.send()
 }
 
-func (self *Printer) Error(v ...interface{})  {
-	msg := fmt.Sprint(v)
+func (self *printer) Error(v ...interface{})  {
+	msg := ""
+	for _, i := range v {
+		msg = msg + fmt.Sprint(i) + " "
+	}
+	msg = strings.TrimSpace(msg)
 	self.dp.Message = msg
 	self.dp.Level = LEVEL_ERROR
-	self.logger.send(self.dp)
+	self.send()
 }
 
-func (self *Printer) ErrorF(format string, v ...interface{})  {
-	msg := fmt.Sprintf(format, v)
+func (self *printer) ErrorF(format string, v ...interface{})  {
+	msg := ""
+	for _, i := range v {
+		msg = msg + fmt.Sprintf(format, i) + " "
+	}
 	self.dp.Message = msg
 	self.dp.Level = LEVEL_ERROR
-	self.logger.send(self.dp)
+	self.send()
 }
 
-func (self *Printer) Panic(v ...interface{})  {
-	msg := fmt.Sprint(v)
+func (self *printer) Panic(v ...interface{})  {
+	msg := ""
+	for _, i := range v {
+		msg = msg + fmt.Sprint(i) + " "
+	}
+	msg = strings.TrimSpace(msg)
 	self.dp.Message = msg
 	self.dp.Level = LEVEL_PANIC
-	self.logger.send(self.dp)
-	panic(msg)
+	self.send()
 }
 
-func (self *Printer) PanicF(format string, v ...interface{})  {
-	msg := fmt.Sprint(format, v)
+func (self *printer) PanicF(format string, v ...interface{})  {
+	msg := ""
+	for _, i := range v {
+		msg = msg + fmt.Sprintf(format, i) + " "
+	}
 	self.dp.Message = msg
 	self.dp.Level = LEVEL_PANIC
-	self.logger.send(self.dp)
-	panic(msg)
+	self.send()
 }
 
-func (self *Printer) Fatal(v ...interface{})  {
-	msg := fmt.Sprint(v)
+func (self *printer) Fatal(v ...interface{})  {
+	msg := ""
+	for _, i := range v {
+		msg = msg + fmt.Sprint(i) + " "
+	}
+	msg = strings.TrimSpace(msg)
 	self.dp.Message = msg
 	self.dp.Level = LEVEL_FATAL
-	self.logger.send(self.dp)
+	self.send()
 	os.Exit(1)
 }
 
-func (self *Printer) FatalF(format string, v ...interface{})  {
-	msg := fmt.Sprintf(format, v)
+func (self *printer) FatalF(format string, v ...interface{})  {
+	msg := ""
+	for _, i := range v {
+		msg = msg + fmt.Sprintf(format, i) + " "
+	}
+	msg = strings.TrimSpace(msg)
 	self.dp.Message = msg
 	self.dp.Level = LEVEL_FATAL
-	self.logger.send(self.dp)
+	self.send()
 	os.Exit(1)
+}
+
+func (self *printer) send()  {
+	self.logger.doLog(self.dp)
 }

@@ -1,50 +1,44 @@
 package bitlog
 
 import (
-	"log"
-	"io"
 	"sync"
+	"github.com/cookuno/bitlog/writer"
 )
 
 type BitLog struct  {
-	chain []chan DataPkg
+	outputs []output
 	lk *sync.Mutex
 }
 
 func New() *BitLog {
-	bitLog := &BitLog{chain:make([]chan DataPkg, 8), lk:new(sync.Mutex)}
+	bitLog := &BitLog{outputs:make([]output,0,1), lk:new(sync.Mutex)}
 	return bitLog
 }
 
-func (self *BitLog) AddOutput(level int, f Formatter, w Writer)  {
+func (self *BitLog) AddOutput(level int, f Formatter, w writer.Writer)  {
 	self.lk.Lock()
 	defer self.lk.Unlock()
 	p := output{level:level, formatter:f, writer:w, logger: self}
-	c := make(chan DataPkg)
-	self.chain = append(self.chain, c)
-	go func(p *output, c chan DataPkg) {
-		go p.on(c)
-	}(&p, c)
+	self.outputs = append(self.outputs, p)
 }
 
-func (self *BitLog) Close() {
-	for _, c := range self.chain {
-		close(c)
+func (self *BitLog) Print() *printer {
+	p := newPrinter(self)
+	return p
+}
+
+func (self *BitLog) doLog(dp DataPkg) {
+	outputLen := len(self.outputs)
+	if outputLen == 0 {
+		w := writer.NewStdWriter(false)
+		f := NewTextLineFormatter();
+		self.AddOutput(LEVEL_DEBUG, f, w)
+	}
+	for i := 0 ; i < outputLen ; i ++ {
+		op := self.outputs[i]
+		op.on(dp)
 	}
 }
-
-func (self *BitLog) Print() (*Printer)  {
-	return &Printer{logger: self, dp: DataPkg{}}
-}
-
-func (self *BitLog) send(dp DataPkg) {
-	for _, c := range self.chain {
-		go func(dp DataPkg, c chan DataPkg) {
-			c <- dp
-		}(dp, c)
-	}
-}
-
 
 
 

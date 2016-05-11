@@ -1,5 +1,7 @@
 package bitlog
 
+import "github.com/cookuno/bitlog/writer"
+
 const (
 	LEVEL_FATAL		= 1
 	LEVEL_PANIC		= 2
@@ -7,36 +9,36 @@ const (
 	LEVEL_WARN 		= 4
 	LEVEL_INFO 		= 5
 	LEVEL_DEBUG 		= 6
-	LEVEL_FATAL_NAME 	= "FATAL"
-	LEVEL_PANIC_NAME 	= "PANIC"
-	LEVEL_ERROR_NAME 	= "ERROR"
-	LEVEL_WARN_NAME 	= "WARN"
-	LEVEL_INFO_NAME 	= "INFO"
-	LEVEL_DEBUG_NAME 	= "DEBUG"
+	level_name_fatal 	= "FATAL"
+	level_name_panic 	= "PANIC"
+	level_name_error 	= "ERROR"
+	level_name_warn 	= "WARN"
+	level_name_info 	= "INFO"
+	level_name_debug 	= "DEBUG"
 )
 
 type output struct  {
 	level 		int
-	writer 		Writer
+	writer 		writer.Writer
 	formatter 	Formatter
 	logger 		*BitLog
 }
 
-func (self *output) on(c chan DataPkg) {
-	var dp DataPkg = nil
-	dp <- c
-	if dp == nil {
-		return
-	}
+func (self *output) on(dp DataPkg) {
 	if self.level == 0 || self.level < dp.Level {
 		return
 	}
 	outputData, fmtErr := self.formatter.Format(&dp)
 	if fmtErr != nil {
 		self.logger.Print().Panic(fmtErr)
+		return
 	}
 	_, outputErr := self.writer.Write(outputData)
 	if outputErr != nil {
 		self.logger.Print().Panic(outputErr)
+		return
+	}
+	if self.level == LEVEL_PANIC {
+		panic(dp)
 	}
 }

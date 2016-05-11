@@ -5,34 +5,29 @@ import (
 )
 
 type DataPkg struct {
-	Time 		*time.Time
+	Time 		time.Time
 	Position 	string
 	Level 		int
-	Attr		*Attribute
+	Attr		AttrMap
 	Message		string
 }
 
 func (self *DataPkg) levelName() string {
 	if self.Level == LEVEL_DEBUG {
-		return LEVEL_DEBUG_NAME
+		return level_name_debug
 	} else if self.Level == LEVEL_INFO {
-		return LEVEL_INFO_NAME
+		return level_name_info
 	} else if self.Level == LEVEL_WARN {
-		return LEVEL_WARN_NAME
+		return level_name_warn
 	} else if self.Level == LEVEL_ERROR {
-		return LEVEL_ERROR_NAME
+		return level_name_error
 	} else if self.Level == LEVEL_PANIC {
-		return LEVEL_PANIC_NAME
+		return level_name_panic
 	} else if self.Level == LEVEL_FATAL {
-		return LEVEL_FATAL_NAME
+		return level_name_fatal
 	} else {
 		return "N/A"
 	}
 }
 
-type Attribute []AttributeEntry
-
-type AttributeEntry struct  {
-	Key interface{}
-	Val interface{}
-}
+type AttrMap map[string]interface{}

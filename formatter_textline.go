@@ -3,13 +3,18 @@ package bitlog
 import (
 	"errors"
 	"fmt"
+	"strings"
 )
 
-type TextLineFormatter struct  {
+type textLineFormatter struct  {
 
 }
 
-func (self TextLineFormatter) Format(dataPkg *DataPkg) ([]byte, error)  {
+func NewTextLineFormatter() textLineFormatter {
+	return textLineFormatter{}
+}
+
+func (self textLineFormatter) Format(dataPkg *DataPkg) ([]byte, error)  {
 	if dataPkg == nil {
 		return nil, errors.New("dataPkg is nil")
 	}
@@ -17,38 +22,39 @@ func (self TextLineFormatter) Format(dataPkg *DataPkg) ([]byte, error)  {
 	if dataPkg.Level > 0 {
 		level := ""
 		if dataPkg.Level == LEVEL_DEBUG {
-			level = COLOR_BLUE + dataPkg.levelName() + COLOR_DEFAULT
+			level = color_blue + dataPkg.levelName() + color_default
 		} else if dataPkg.Level == LEVEL_INFO {
-			level = COLOR_GREEN + dataPkg.levelName() + COLOR_DEFAULT
+			level = color_green + dataPkg.levelName() + color_default
 		} else if dataPkg.Level == LEVEL_WARN {
-			level = COLOR_YELLOW + dataPkg.levelName() + COLOR_DEFAULT
+			level = color_yello + dataPkg.levelName() + color_default
 		} else if dataPkg.Level == LEVEL_ERROR {
-			level = COLOR_RED + dataPkg.levelName() + COLOR_DEFAULT
+			level = color_red + dataPkg.levelName() + color_default
 		} else if dataPkg.Level == LEVEL_PANIC {
-			level = COLOR_RED + dataPkg.levelName() + COLOR_DEFAULT
+			level = color_red + dataPkg.levelName() + color_default
 		} else if dataPkg.Level == LEVEL_FATAL {
-			level = COLOR_RED + dataPkg.levelName() + COLOR_DEFAULT
+			level = color_red + dataPkg.levelName() + color_default
 		}
-		level = "LEVEL=" + level
 		textLine = textLine + level + " | "
 	}
-	if dataPkg.Time != nil || dataPkg.Time.IsZero() {
-		textLine = textLine + "TIME=" + dataPkg.Time.String() + " | "
+	if !dataPkg.Time.IsZero() {
+		textLine = textLine + color_yello + dataPkg.Time.String() + color_default + " | "
 	}
-	textLine = textLine + " " + dataPkg.Message + " | "
+	textLine = textLine + dataPkg.Message + " | "
 	if dataPkg.Attr != nil {
 		attrLine := ""
-		for _, attr := range dataPkg.Attr {
-			key := COLOR_ATTR + fmt.Sprint(attr.Key) + COLOR_DEFAULT
-			val := fmt.Sprint(attr.Val)
-			attrLine = attrLine + key + "=" + val + " ; "
+		for k, v := range dataPkg.Attr {
+			key := color_attr + k + color_default
+			val := fmt.Sprint(v)
+			attrLine = attrLine + key + "=" + val + ";"
 		}
+		attrLine = strings.TrimSpace(attrLine)
+		attrLine = attrLine[0:len(attrLine) - 1]
 		if attrLine != "" {
-			textLine = textLine + " " + attrLine + " | "
+			textLine = textLine + attrLine + " | "
 		}
 	}
-	if dataPkg.Position == "" {
-		textLine = textLine + "LINE=" + dataPkg.Position + " "
+	if dataPkg.Position != "" {
+		textLine = textLine + dataPkg.Position + " "
 	}
-	return []byte(textLine + "\n"), nil
+	return []byte(textLine), nil
 }

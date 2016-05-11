@@ -1,8 +1,6 @@
-package bitlog
+package writer
 
-import (
-	"io"
-)
+import "io"
 
 type Writer interface  {
 	io.Writer
